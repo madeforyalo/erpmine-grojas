@@ -94,7 +94,7 @@ TimeEntry.class_eval do
 	end
 end
 
-Redmine::Plugin.register :redmine_wktime do
+Redmine::Plugin.register :redmine_wktime_lite do
   name 'ERPmine'
   author 'Adhi Software Pvt Ltd'
   description 'ERPmine is an ERP for Service Industries. It has the following modules: Time & Expense, Attendance, Payroll, CRM, Billing, Accounting, Purchasing, Inventory, Asset , Reports, Dashboards and Survey'
