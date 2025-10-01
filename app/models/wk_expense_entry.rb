@@ -101,7 +101,7 @@ class WkExpenseEntry < TimeEntry
   def self.getReimburse(project_id)
     reimburse = self.where(project_id: project_id, payroll_id: nil)
      # Include only Apprrove Reimbusement
-    if Setting.plugin_redmine_wktime['approve_reimbursement'].present?
+    if Setting.plugin_redmine_wktime_lite['approve_reimbursement'].present?
       reimburse = reimburse.joins(:wkstatus).where(:wk_statuses => {status: 'a'})
     end
     reimburse

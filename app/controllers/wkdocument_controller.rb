@@ -18,7 +18,6 @@
 class WkdocumentController < WkbaseController
 
   before_action :find_attachment, :only => [:destroy, :download]
-  include WkdocumentHelper
   helper :attachments
 
   def new

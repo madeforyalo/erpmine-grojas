@@ -5,7 +5,7 @@ module WkleaverequestHelper
 		leaveType = Array.new
 	    if getLeaveSettings.present?
 			leaveTypeIDs = getLeaveSettings.map{ |entry| entry.split('|').first }
-			leaveTypeIDs.delete(Setting.plugin_redmine_wktime['wktime_loss_of_pay'].split('|').first) if Setting.plugin_redmine_wktime['wktime_loss_of_pay'].present?
+			leaveTypeIDs.delete(Setting.plugin_redmine_wktime_lite['wktime_loss_of_pay'].split('|').first) if Setting.plugin_redmine_wktime_lite['wktime_loss_of_pay'].present?
 			leaveType = Issue.select(:id, :subject).where(id: leaveTypeIDs).collect{ |issue| [issue.subject, issue.id]}
 		end
 		leaveType

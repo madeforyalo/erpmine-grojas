@@ -24,9 +24,9 @@
 <% $headerEntriesId = Array.new %>
 <% $headerhoursdiff = Array.new %>
 <% st = Array.new %>
-<% disable = validateERPPermission('A_TE_PRVLG') ? (User.current.id == @user.id ? !(!Setting.plugin_redmine_wktime['wktime_own_approval'].blank? && 
-	Setting.plugin_redmine_wktime['wktime_own_approval'].to_i == 1 ) : false) : true	%>
-<%=h hidden_field_tag("break_time" , Setting.plugin_redmine_wktime['wktime_break_time'] )  %> 
+<% disable = validateERPPermission('A_TE_PRVLG') ? (User.current.id == @user.id ? !(!Setting.plugin_redmine_wktime_lite['wktime_own_approval'].blank? && 
+	Setting.plugin_redmine_wktime_lite['wktime_own_approval'].to_i == 1 ) : false) : true	%>
+<%=h hidden_field_tag("break_time" , Setting.plugin_redmine_wktime_lite['wktime_break_time'] )  %> 
 <% for i in 1..7 %>
 	<div id="clockInOut-dlg<%= i %>" title="<%= l(:report_attendance) %>">
 	<% if (@startday + (i-1)) < Date.today || (@startday + (i-1)) == Date.today  %>

@@ -16,10 +16,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class WkleaverequestController < WkbaseController
-  menu_item :wkattendance
-  include WkleaverequestHelper
-	include WkpayrollHelper
-  include WksurveyHelper
   accept_api_auth :index, :edit, :save, :getLeaveType
 
   def index

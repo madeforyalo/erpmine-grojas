@@ -21,7 +21,6 @@ module WktimeHelper
   include Redmine::Export::PDF::IssuesPdfHelper
   include Redmine::Utils::DateCalculation
 	include AttachmentsHelper
-	include WkdocumentHelper
 
 
 	def options_for_period_select(value)
@@ -141,14 +140,14 @@ module WktimeHelper
   def wktime_to_pdf(entries, user, startday, unitLabel)
 
 		# Landscape A4 = 210 x 297 mm
-		page_height   = Setting.plugin_redmine_wktime['wktime_page_height'].to_i
-		page_width    = Setting.plugin_redmine_wktime['wktime_page_width'].to_i
-		right_margin  = Setting.plugin_redmine_wktime['wktime_margin_right'].to_i
-		left_margin  = Setting.plugin_redmine_wktime['wktime_margin_left'].to_i
-		bottom_margin = Setting.plugin_redmine_wktime['wktime_margin_bottom'].to_i
-		top_margin = Setting.plugin_redmine_wktime['wktime_margin_top'].to_i
+		page_height   = Setting.plugin_redmine_wktime_lite['wktime_page_height'].to_i
+		page_width    = Setting.plugin_redmine_wktime_lite['wktime_page_width'].to_i
+		right_margin  = Setting.plugin_redmine_wktime_lite['wktime_margin_right'].to_i
+		left_margin  = Setting.plugin_redmine_wktime_lite['wktime_margin_left'].to_i
+		bottom_margin = Setting.plugin_redmine_wktime_lite['wktime_margin_bottom'].to_i
+		top_margin = Setting.plugin_redmine_wktime_lite['wktime_margin_top'].to_i
 		col_id_width  = 10
-		row_height    = Setting.plugin_redmine_wktime['wktime_line_space'].to_i
+		row_height    = Setting.plugin_redmine_wktime_lite['wktime_line_space'].to_i
 
 		if page_height == 0
 			page_height = 297
@@ -224,7 +223,6 @@ module WktimeHelper
 		pdf.SetAutoPageBreak(false)
 		pdf.AddPage(orientation)
 
-		logo = WkLocation.getMainLogo()
 		if logo.present?
 			pdf.Image(logo.diskfile.to_s, page_width-50, 15, 30, 20)
 		end
@@ -324,10 +322,10 @@ module WktimeHelper
 		key = entry.project.id.to_s + (entry.issue.blank? ? '' : entry.issue.id.to_s) + (entry.activity.blank? ? '' : entry.activity.id.to_s) + (unitLabel.blank? ? '' : entry.currency.to_s)
 		entry.custom_field_values.each do |custom_value|
 			custom_field = custom_value.custom_field
-			if (!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].blank? &&	Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].to_i == custom_field.id)
+			if (!Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row1'].blank? &&	Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row1'].to_i == custom_field.id)
 				cf_in_row1_value = custom_value.to_s
 			end
-			if (!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].blank? && Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].to_i == custom_field.id)
+			if (!Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row2'].blank? && Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row2'].to_i == custom_field.id)
 				cf_in_row2_value = custom_value.to_s
 			end
 		end
@@ -337,7 +335,7 @@ module WktimeHelper
 		if (!cf_in_row2_value.blank?)
 			key = key + cf_in_row2_value
 		end
-		if (!Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].blank? && Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].to_i == 1)
+		if (!Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].blank? && Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].to_i == 1)
 			if(!entry.comments.blank?)
 				key = key + entry.comments
 			end
@@ -418,8 +416,8 @@ def getColumnValues(matrix, totals, unitLabel,rowNumberRequired, j=0, includeCom
 						col_values[k+1] = entry.issue.blank? ? "" : entry.issue.subject
 						col_values[k+2] = entry.activity.blank? ? "" : entry.activity.name
 						currencyColIndex = k+3
-						if includeComments && (!Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].blank? &&
-						Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].to_i == 1)
+						if includeComments && (!Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].blank? &&
+						Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].to_i == 1)
 							col_values[k+3]= entry.comments
 							currencyColIndex = k+4
 						end
@@ -525,7 +523,7 @@ end
 		base_x = pdf.GetX
 		base_y = pdf.GetY
 
-		submissionAck   = Setting.plugin_redmine_wktime['wktime_submission_ack']
+		submissionAck   = Setting.plugin_redmine_wktime_lite['wktime_submission_ack']
 
 		unless submissionAck.blank?
 			check_render_newpage(pdf,page_height,row_height,bottom_margin,submissionAck,orientation,logo,page_width)
@@ -559,9 +557,9 @@ end
 	end
 	def set_cf_header(columns, col_width, setting_name)
 		cf_value = nil
-		if !Setting.plugin_redmine_wktime[setting_name].blank? && !@new_custom_field_values.blank? &&
+		if !Setting.plugin_redmine_wktime_lite[setting_name].blank? && !@new_custom_field_values.blank? &&
 			(cf_value = @new_custom_field_values.detect { |cfv|
-				cfv.custom_field.id == Setting.plugin_redmine_wktime[setting_name].to_i }) != nil
+				cfv.custom_field.id == Setting.plugin_redmine_wktime_lite[setting_name].to_i }) != nil
 
 				columns << cf_value.custom_field.name
 				unless col_width.blank?
@@ -588,9 +586,9 @@ end
 
 	def set_cf_value(col_values, custom_field_values, setting_name)
 		cf_value = nil
-		if !Setting.plugin_redmine_wktime[setting_name].blank? &&
+		if !Setting.plugin_redmine_wktime_lite[setting_name].blank? &&
 				(cf_value = custom_field_values.detect { |cfv|
-					cfv.custom_field.id == Setting.plugin_redmine_wktime[setting_name].to_i }) != nil
+					cfv.custom_field.id == Setting.plugin_redmine_wktime_lite[setting_name].to_i }) != nil
 					col_values << cf_value.value
 		end
 	end
@@ -623,7 +621,6 @@ end
 			tabs = []
 			tabs << {:name => 'wktime', :partial => 'wktime/tab_content', :label => :label_wktime} if showTime
 			tabs << {:name => 'wkexpense', :partial => 'wktime/tab_content', :label => :label_wkexpense} if showExpense
-		 elsif params[:controller] == "wkattendance" || params[:controller] == "wkpayroll" || params[:controller] == "wkscheduling"  || params[:controller] == "wkschedulepreference" || params[:controller] == "wkshift" || params[:controller] == "wkpublicholiday" || params[:controller] == "wksurvey" || params[:controller] == "wkleaverequest" || params[:controller] == "wkskill" || params[:controller] == "wkreferrals"
 				tabs = []
 				if showAttendance
 					tabs << {:name => 'leave', :partial => 'wktime/tab_content', :label => :label_wk_leave}
@@ -634,7 +631,7 @@ end
 				tabs << {:name => 'payroll', :partial => 'wktime/tab_content', :label => :label_payroll} if showPayroll
 				tabs <<  {:name => 'wkscheduling', :partial => 'wktime/tab_content', :label => :label_scheduling} if showShiftScheduling
 				tabs << {:name => 'wksurvey', :partial => 'wktime/tab_content', :label => :label_survey} if showSurvey
-				tabs <<	{name: 'wkskill', partial: 'wktime/tab_content', :label => :label_wk_skill} if showSkill
+#				tabs <<	{name: 'wkskill', partial: 'wktime/tab_content', :label => :label_wk_skill} if showSkill
 				tabs << {:name => 'wkreferrals', :partial => 'wktime/tab_content', :label => :label_referrals} if isChecked("wktime_enable_referrals_module")
 
 		elsif params[:controller] == "wkcrmdashboard" || params[:controller] == "wklead" || params[:controller] == "wkcrmaccount" || params[:controller] == "wkopportunity" || params[:controller] == "wkcrmactivity" || params[:controller] == "wkcrmcontact" || params[:controller] == "wksalesquote"
@@ -659,15 +656,7 @@ end
 				{:name => 'wkgltransaction', :partial => 'wktime/tab_content', :label => :label_transaction},
 				{:name => 'wkledger', :partial => 'wktime/tab_content', :label => :label_ledger}
 			   ]
-		elsif params[:controller] == "wkrfq" || params[:controller] == "wkquote" || params[:controller] == "wkpurchaseorder" || params[:controller] == "wksupplierinvoice" || params[:controller] == "wksupplierpayment" || params[:controller] == "wksupplieraccount" || params[:controller] == "wksuppliercontact"
 			tabs = [
-				{:name => 'wkrfq', :partial => 'wktime/tab_content', :label => :label_rfq},
-				{:name => 'wkquote', :partial => 'wktime/tab_content', :label => :label_quotes},
-				{:name => 'wkpurchaseorder', :partial => 'wktime/tab_content', :label => :label_purchase_order},
-				{:name => 'wksupplierinvoice', :partial => 'wktime/tab_content', :label => :label_supplier_invoice},
-				{:name => 'wksupplierpayment', :partial => 'wktime/tab_content', :label => :label_supplier_payment},
-				{:name => 'wksupplieraccount', :partial => 'wktime/tab_content', :label => :label_supplier_account},
-				{:name => 'wksuppliercontact', :partial => 'wktime/tab_content', :label => :label_supplier_contact}
 			   ]
 		elsif params[:controller] == "wkcrmenumeration" || params[:controller] == "wktax" || params[:controller] == "wkexchangerate" || params[:controller] == "wklocation" || params[:controller] == "wkgrouppermission" || params[:controller] == "wknotification"
 			tabs = [
@@ -790,7 +779,7 @@ end
 
 	def getPublicHolidays()
 		holidays = nil
-		publicHolidayList = Setting.plugin_redmine_wktime['wktime_public_holiday']
+		publicHolidayList = Setting.plugin_redmine_wktime_lite['wktime_public_holiday']
 		if !publicHolidayList.blank?
 			holidays = Array.new
 			publicHolidayList.each do |holiday|
@@ -953,7 +942,7 @@ end
 		groupusers = Array.new
 		nonSubmissionUserIds = Array.new
 		userIds = ""
-		accountGrpIds = Setting.plugin_redmine_wktime['wktime_approval_groups'] if !Setting.plugin_redmine_wktime['wktime_approval_groups'].blank?
+		accountGrpIds = Setting.plugin_redmine_wktime_lite['wktime_approval_groups'] if !Setting.plugin_redmine_wktime_lite['wktime_approval_groups'].blank?
 		if !accountGrpIds.blank?
 			accountGrpIds = accountGrpIds.collect{|i| i.to_i}
 		end
@@ -979,9 +968,7 @@ end
 
 	def findLastAttnEntry(isCurrentUser)
 		if isCurrentUser
-			lastAttnEntries = WkAttendance.find_by_sql("select a.* from wk_attendances a inner join ( select max(start_time) as start_time,user_id from wk_attendances where user_id = #{User.current.id} " + get_comp_cond('wk_attendances') + " group by user_id ) vw on a.start_time = vw.start_time and a.user_id = vw.user_id " + get_comp_cond('a', 'where') + " order by a.start_time ")
 		else
-			lastAttnEntries = WkAttendance.find_by_sql("select a.* from wk_attendances a inner join ( select max(start_time) as start_time,user_id from wk_attendances " + get_comp_cond('wk_attendances', 'where') + " group by user_id ) vw on a.start_time = vw.start_time and a.user_id = vw.user_id " + get_comp_cond('a', 'where') + " order by a.start_time ")
 		end
 		lastAttnEntries
 	end
@@ -989,8 +976,8 @@ end
 	def computeWorkedHours(startTime,endTime, ishours)
 		currentEntryDate = startTime.localtime
 		workedHours = endTime-startTime
-		if !Setting.plugin_redmine_wktime['wktime_break_time'].blank?
-			Setting.plugin_redmine_wktime['wktime_break_time'].each_with_index do |element,index|
+		if !Setting.plugin_redmine_wktime_lite['wktime_break_time'].blank?
+			Setting.plugin_redmine_wktime_lite['wktime_break_time'].each_with_index do |element,index|
 			  listboxArr = element.split('|')
 			  breakStart = currentEntryDate.change({ hour: listboxArr[0], min: listboxArr[1], sec: 0 })
 			  breakEnd = currentEntryDate.change({ hour: listboxArr[2], min:listboxArr[3], sec: 0 })
@@ -1019,22 +1006,21 @@ end
 
 	def totalhours
 		dateStr = getConvertDateStr('start_time')
-		(WkAttendance.where("user_id = #{User.current.id} and #{dateStr} = '#{Time.now.strftime("%Y-%m-%d")}'").sum(:hours)).round(2)
 	end
 
 	def showExpense
-		!Setting.plugin_redmine_wktime['wktime_enable_expense_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_expense_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_expense_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_expense_module'].to_i == 1
 	end
 
 	def showAttendance
-		!Setting.plugin_redmine_wktime['wktime_enable_attendance_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_attendance_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_attendance_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_attendance_module'].to_i == 1
 	end
 
 	def showReports
-		!Setting.plugin_redmine_wktime['wktime_enable_report_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_report_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_report_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_report_module'].to_i == 1
 	end
 
 	def getTEAllTimeRange(ids)
@@ -1045,8 +1031,6 @@ end
 
 	def getAttnAllTimeRange(ids)
 		dateStr = getConvertDateStr('start_time')
-		teQuery = "select (#{dateStr}) as startday from wk_attendances w where user_id in (#{ids}) " + get_comp_cond('w') + " order by #{dateStr} "
-		teResult = WkAttendance.find_by_sql(teQuery)
 	end
 
 	def getUserAllTimeRange(ids)
@@ -1100,18 +1084,18 @@ end
 	end
 
 	def showPayroll
-		!Setting.plugin_redmine_wktime['wktime_enable_payroll_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_payroll_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_payroll_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_payroll_module'].to_i == 1
 	end
 
 	def showSurvey
-		!Setting.plugin_redmine_wktime['wktime_enable_survey_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_survey_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_survey_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_survey_module'].to_i == 1
     end
 
 	def showBilling
-		(!Setting.plugin_redmine_wktime['wktime_enable_billing_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_billing_module'].to_i == 1 ) #&& isModuleAdmin('wktime_billing_groups')
+		(!Setting.plugin_redmine_wktime_lite['wktime_enable_billing_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_billing_module'].to_i == 1 ) #&& isModuleAdmin('wktime_billing_groups')
 	end
 
 	# Return the given type of custom Fields array
@@ -1132,7 +1116,7 @@ end
 	end
 
 	def getPluginSetting(setting_name)
-		Setting.plugin_redmine_wktime[setting_name]
+		Setting.plugin_redmine_wktime_lite[setting_name]
 	end
 
 	def isModuleAdmin(settings)
@@ -1150,7 +1134,7 @@ end
 	end
 
 	def getSettingCfId(settingId)
-		cfId = Setting.plugin_redmine_wktime[settingId].blank? ? 0 : Setting.plugin_redmine_wktime[settingId].to_i
+		cfId = Setting.plugin_redmine_wktime_lite[settingId].blank? ? 0 : Setting.plugin_redmine_wktime_lite[settingId].to_i
 		cfId
 	end
 
@@ -1165,17 +1149,17 @@ end
 	end
 
 	def showAccounting
-		(!Setting.plugin_redmine_wktime['wktime_enable_accounting_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_accounting_module'].to_i == 1 ) && (validateERPPermission("B_ACC_PRVLG") || validateERPPermission("A_ACC_PRVLG"))
+		(!Setting.plugin_redmine_wktime_lite['wktime_enable_accounting_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_accounting_module'].to_i == 1 ) && (validateERPPermission("B_ACC_PRVLG") || validateERPPermission("A_ACC_PRVLG"))
 	end
 
 	def isChecked(settingName)
-		(!Setting.plugin_redmine_wktime[settingName].blank? && Setting.plugin_redmine_wktime[settingName].to_i == 1)
+		(!Setting.plugin_redmine_wktime_lite[settingName].blank? && Setting.plugin_redmine_wktime_lite[settingName].to_i == 1)
 	end
 
 	def showCRMModule
-		(!Setting.plugin_redmine_wktime['wktime_enable_crm_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_crm_module'].to_i == 1 ) && (validateERPPermission("B_CRM_PRVLG") || validateERPPermission("A_CRM_PRVLG"))
+		(!Setting.plugin_redmine_wktime_lite['wktime_enable_crm_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_crm_module'].to_i == 1 ) && (validateERPPermission("B_CRM_PRVLG") || validateERPPermission("A_CRM_PRVLG"))
 	end
 
 	def getGroupUserIdsArr(groupId)
@@ -1185,7 +1169,6 @@ end
 
 	def getGroupUserArr(shortName)
 		userIdArr = Array.new
-		userIds =WkPermission.joins(:grpPermission, :users, :group )
             .where(short_name: shortName)
             .select("users.id, users.firstname, users.lastname")
 		if !userIds.blank?
@@ -1206,39 +1189,39 @@ end
 	end
 
 	def showTimeExpense
-		(!Setting.plugin_redmine_wktime['wktime_enable_time_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_time_module'].to_i == 1) ||
-			(!Setting.plugin_redmine_wktime['wktime_enable_expense_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_expense_module'].to_i == 1) ||
+		(!Setting.plugin_redmine_wktime_lite['wktime_enable_time_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_time_module'].to_i == 1) ||
+			(!Setting.plugin_redmine_wktime_lite['wktime_enable_expense_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_expense_module'].to_i == 1) ||
 			# if none of the settings is checked
-			( (Setting.plugin_redmine_wktime['wktime_enable_dashboards_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_dashboards_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_time_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_time_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_expense_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_expense_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_attendance_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_attendance_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_shift'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_shift'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_payroll_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_payroll_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_survey_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_survey_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_billing_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_billing_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_accounting_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_accounting_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_crm_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_crm_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_purchase_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_purchase_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_inventory_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_inventory_module'].to_i == 0) &&
-			(Setting.plugin_redmine_wktime['wktime_enable_report_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_report_module'].to_i == 0 ) ) ||
-			((Setting.plugin_redmine_wktime['wktime_enable_dashboards_module'].blank? ||
-			Setting.plugin_redmine_wktime['wktime_enable_dashboards_module'].to_i == 0))
+			( (Setting.plugin_redmine_wktime_lite['wktime_enable_dashboards_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_dashboards_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_time_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_time_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_expense_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_expense_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_attendance_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_attendance_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_shift'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_shift'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_payroll_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_payroll_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_survey_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_survey_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_billing_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_billing_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_accounting_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_accounting_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_crm_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_crm_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_purchase_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_purchase_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_inventory_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_inventory_module'].to_i == 0) &&
+			(Setting.plugin_redmine_wktime_lite['wktime_enable_report_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_report_module'].to_i == 0 ) ) ||
+			((Setting.plugin_redmine_wktime_lite['wktime_enable_dashboards_module'].blank? ||
+			Setting.plugin_redmine_wktime_lite['wktime_enable_dashboards_module'].to_i == 0))
 	end
 
 	def getDatesSql(from, intervalVal, intervalType, to)
@@ -1297,13 +1280,13 @@ end
 	end
 
 	def showPurchase
-		(!Setting.plugin_redmine_wktime['wktime_enable_purchase_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_purchase_module'].to_i == 1 ) && (validateERPPermission("B_PUR_PRVLG") || validateERPPermission("A_PUR_PRVLG"))
+		(!Setting.plugin_redmine_wktime_lite['wktime_enable_purchase_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_purchase_module'].to_i == 1 ) && (validateERPPermission("B_PUR_PRVLG") || validateERPPermission("A_PUR_PRVLG"))
 	end
 
 	def showInventory
-		(!Setting.plugin_redmine_wktime['wktime_enable_inventory_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_inventory_module'].to_i == 1 ) && validateERPPermission("V_INV")
+		(!Setting.plugin_redmine_wktime_lite['wktime_enable_inventory_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_inventory_module'].to_i == 1 ) && validateERPPermission("V_INV")
 	end
 
 	def generic_options_for_select(model, sqlCond, orderBySql, displayCol, valueCol, selectedVal, needBlank)
@@ -1325,15 +1308,10 @@ end
 			#ddArray = ddValues.collect {|t| [t["#{displayCol}"], t["#{valueCol}"]]
 			ddValues.each do | entry |
 				ddArray << [entry["#{displayCol}"], entry["#{valueCol}"]]
-				selectedVal = entry.id if model == WkLocation && selectedVal.nil? && entry.is_default?
 			end
 		end
 
-		if model == WkLocation
 			ddArray = ddArray.unshift([" ","0"]) if needBlank
-		else
-			ddArray = ddArray.unshift(["",""]) if needBlank
-		end
 		options_for_select(ddArray, :selected => selectedVal)
 	end
 
@@ -1380,7 +1358,7 @@ end
 	end
 
 	def showShiftScheduling
-		!Setting.plugin_redmine_wktime['wktime_enable_shift scheduling_module'].blank? && Setting.plugin_redmine_wktime['wktime_enable_shift scheduling_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_shift scheduling_module'].blank? && Setting.plugin_redmine_wktime_lite['wktime_enable_shift scheduling_module'].to_i == 1
 	end
 
 	def options_for_number_select(startWith, endOn, incrementBy, selectedValue)
@@ -1564,13 +1542,13 @@ end
 	end
 
 	def getInvWeekStartDay
-		startDay = Setting.plugin_redmine_wktime['wktime_generate_invoice_day']
+		startDay = Setting.plugin_redmine_wktime_lite['wktime_generate_invoice_day']
 		startDay = 0 if startDay.blank?
 		startDay.to_i
 	end
 
 	def getMonthStartDay
-		startDay = Setting.plugin_redmine_wktime['wktime_generate_invoice_month_start']
+		startDay = Setting.plugin_redmine_wktime_lite['wktime_generate_invoice_month_start']
 		startDay = 1 if startDay.blank?
 		startDay.to_i
 	end
@@ -1659,17 +1637,17 @@ end
 	end
 
 	def isSupervisorApproval
-		(!Setting.plugin_redmine_wktime['ftte_supervisor_based_approval'].blank? && Setting.plugin_redmine_wktime['ftte_supervisor_based_approval'].to_i == 1)
+		(!Setting.plugin_redmine_wktime_lite['ftte_supervisor_based_approval'].blank? && Setting.plugin_redmine_wktime_lite['ftte_supervisor_based_approval'].to_i == 1)
 	end
 
 	def canSupervisorEdit
-		#(!Setting.plugin_redmine_wktime.blank? && !Setting.plugin_redmine_wktime['ftte_edit_time_log'].blank? && Setting.plugin_redmine_wktime['ftte_edit_time_log'].to_i == 1)
+		#(!Setting.plugin_redmine_wktime_lite.blank? && !Setting.plugin_redmine_wktime_lite['ftte_edit_time_log'].blank? && Setting.plugin_redmine_wktime_lite['ftte_edit_time_log'].to_i == 1)
 		# Move the canSupervisorEdit and overrideSpentTime under one isSupervisorApproval settings
 		isSupervisorApproval
 	end
 
 	def overrideSpentTime
-		# (!Setting.plugin_redmine_wktime['ftte_override_spent_time_report'].blank? && Setting.plugin_redmine_wktime['ftte_override_spent_time_report'].to_i == 1)
+		# (!Setting.plugin_redmine_wktime_lite['ftte_override_spent_time_report'].blank? && Setting.plugin_redmine_wktime_lite['ftte_override_spent_time_report'].to_i == 1)
 		# Move the canSupervisorEdit and overrideSpentTime under one isSupervisorApproval settings
 		isSupervisorApproval
 	end
@@ -1708,21 +1686,20 @@ end
 	# ============ End of supervisor code merge =========
 
 	def showTime
-		!Setting.plugin_redmine_wktime['wktime_enable_time_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_time_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_time_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_time_module'].to_i == 1
   	end
 
 	def show_plugin_name
 		show_erpmine = 'false'
 		erpModules.values.each do | erpmodule |
-			perm_setting = WkPermission.where(:modules => erpmodule)
 			erpmodule = erpmodule.downcase
 			unless perm_setting.first.blank?
 				perm_setting.each do | permission |
-					show_erpmine = 'true' if Setting.plugin_redmine_wktime["wktime_enable_#{erpmodule}_module"].to_i == 1 && validateERPPermission(permission.short_name)
+					show_erpmine = 'true' if Setting.plugin_redmine_wktime_lite["wktime_enable_#{erpmodule}_module"].to_i == 1 && validateERPPermission(permission.short_name)
 				end
 			else
-				show_erpmine = 'true' if Setting.plugin_redmine_wktime["wktime_enable_#{erpmodule}_module"].to_i == 1
+				show_erpmine = 'true' if Setting.plugin_redmine_wktime_lite["wktime_enable_#{erpmodule}_module"].to_i == 1
 			end
 		end
 		show_erpmine
@@ -1744,7 +1721,6 @@ end
 					end
 				when "Attendance"
 					if showAttendance
-						redirect[:controller] = 'wkattendance'
 						return redirect
 					end
 				when "Payroll"
@@ -1774,7 +1750,6 @@ end
 					end
 				when "Purchase"
 					if showPurchase && validateERPPermission("B_PUR_PRVLG")
-						redirect[:controller] = 'wkrfq'
 						return redirect
 					end
 				when "Inventory"
@@ -1888,7 +1863,6 @@ end
 	end
 
 	def getAssetQuantity(startDate, endDate, inventory_item_id)
-		inventoryObj = WkInventoryItem.find(inventory_item_id)
 		obj = inventoryObj.asset_property
 		hours = ((endDate - startDate) / (60 * 60)).round(2)
 		case obj.rate_per
@@ -1945,8 +1919,8 @@ end
 	end
 
 	def showSkill
-		!Setting.plugin_redmine_wktime['wktime_enable_skills_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_skills_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_skills_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_skills_module'].to_i == 1
 	end
 
 	def statusValidation(time_entry)
@@ -1956,7 +1930,6 @@ end
 	end
 
 	def getAllLocations
-		wklocations = WkLocation.order(name: :asc)
 		locations = []
 		locations = wklocations.map { |loc| { value: loc.id, label: loc.name }}
 	end

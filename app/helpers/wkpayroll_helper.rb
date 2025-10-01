@@ -17,7 +17,7 @@
 
 module WkpayrollHelper
 	include WktimeHelper
-	include WkattendanceHelper
+#	include WkattendanceHelper
 	require 'date'
 
 	def getSalaryComponentsArr
@@ -105,7 +105,7 @@ module WkpayrollHelper
 	end
 
 	def getFinancialStart
-		financialMonthStr = Setting.plugin_redmine_wktime['wktime_financial_year_start']
+		financialMonthStr = Setting.plugin_redmine_wktime_lite['wktime_financial_year_start']
 		if financialMonthStr.blank? || financialMonthStr.to_i == 0
 			financialMonthStr = '4'
 		end
@@ -116,7 +116,7 @@ module WkpayrollHelper
 		@payrollList = Array.new
 		deleteWkSalaries(userIds, salaryDate)
 		userSalaryHash = getUserSalaryHash(userIds,salaryDate)
-		currency = Setting.plugin_redmine_wktime['wktime_currency']
+		currency = Setting.plugin_redmine_wktime_lite['wktime_currency']
 		resMsg = Hash.new
 		unless userSalaryHash.blank?
 			getPayrollData(userSalaryHash, salaryDate)
@@ -128,7 +128,7 @@ module WkpayrollHelper
 
 		if resMsg[:e].blank? && isChecked('salary_auto_post_gl')
 			basicledger = WkSalaryComponents.where("component_type = 'b' and ledger_id is not null ").count
-			if Setting.plugin_redmine_wktime['wktime_cr_ledger'].present? && basicledger.to_i != 0
+			if Setting.plugin_redmine_wktime_lite['wktime_cr_ledger'].present? && basicledger.to_i != 0
 				resMsg[:e] = generateGlTransaction(salaryDate)
 			else
 				resMsg[:e] =  l(:error_trans_msg)
@@ -138,7 +138,7 @@ module WkpayrollHelper
 	end
 
 	def getPayrollData(userSalaryHash, salaryDate)
-		currency = Setting.plugin_redmine_wktime['wktime_currency']
+		currency = Setting.plugin_redmine_wktime_lite['wktime_currency']
 		userSalaryHash.each do |userId, salary|
 			salary.each do |componentId, amount|
 				@payrollList << {:user_id => userId, :salary_component_id => componentId, :amount => amount.round, :currency => currency, :salary_date => salaryDate}
@@ -339,8 +339,8 @@ module WkpayrollHelper
 	end
 
 	def getPayPeriod(salaryDate)
-		payPeriod = Setting.plugin_redmine_wktime['wktime_pay_period']
-		payDay = Setting.plugin_redmine_wktime['wktime_pay_day']
+		payPeriod = Setting.plugin_redmine_wktime_lite['wktime_pay_period']
+		payDay = Setting.plugin_redmine_wktime_lite['wktime_pay_day']
 		payPeriodArr = nil
 		case payPeriod
 			when 'bw' then payPeriodArr = [salaryDate-14,salaryDate-1]
@@ -378,11 +378,11 @@ module WkpayrollHelper
 
 	def getLossOfPayDays(payPeriod, userId)
 		lossOfPayId = 0
-		unless Setting.plugin_redmine_wktime['wktime_loss_of_pay'].blank?
-			lossOfPayId  = Setting.plugin_redmine_wktime['wktime_loss_of_pay'].to_i
+		unless Setting.plugin_redmine_wktime_lite['wktime_loss_of_pay'].blank?
+			lossOfPayId  = Setting.plugin_redmine_wktime_lite['wktime_loss_of_pay'].to_i
 		end
 		lossOfPayHours = TimeEntry.where("user_id = #{userId} and spent_on between '#{payPeriod[0]}' and '#{payPeriod[1]}' and issue_id = #{lossOfPayId}").sum(:hours)
-		defaultWorkTime = !Setting.plugin_redmine_wktime['wktime_default_work_time'].blank? ? Setting.plugin_redmine_wktime['wktime_default_work_time'].to_i : 8
+		defaultWorkTime = !Setting.plugin_redmine_wktime_lite['wktime_default_work_time'].blank? ? Setting.plugin_redmine_wktime_lite['wktime_default_work_time'].to_i : 8
 		lossOfPayDays = (lossOfPayHours.to_f/defaultWorkTime.to_f)
 		lossOfPayDays
 	end
@@ -499,12 +499,12 @@ module WkpayrollHelper
 		ledgersIdHash = Hash[*ledgerIds.flatten]
 		basicLedgerId = WkSalaryComponents.where("component_type = 'b' ").first.ledger_id
 		salaries[basicLedgerId] = salaries[basicLedgerId].to_i + allowanceAmt.to_i
-		crLedgerId = Setting.plugin_redmine_wktime['wktime_cr_ledger'].to_i
+		crLedgerId = Setting.plugin_redmine_wktime_lite['wktime_cr_ledger'].to_i
 		transTypeArr = WkLedger.where(:id => crLedgerId).pluck(:id, :ledger_type)
 		transTypeHash = Hash[*transTypeArr.flatten]
 
 		glTransaction = WkGlTransaction.new
-		glTransaction.trans_type = transTypeHash[Setting.plugin_redmine_wktime['wktime_cr_ledger'].to_i] == "BA" || transTypeHash[Setting.plugin_redmine_wktime['wktime_cr_ledger'].to_i] == "CS" ? "P" : "J"
+		glTransaction.trans_type = transTypeHash[Setting.plugin_redmine_wktime_lite['wktime_cr_ledger'].to_i] == "BA" || transTypeHash[Setting.plugin_redmine_wktime_lite['wktime_cr_ledger'].to_i] == "CS" ? "P" : "J"
 		glTransaction.trans_date = salaryDate
 		unless glTransaction.valid?
 			errorMsg = glTransaction.errors.full_messages.join("<br>")
@@ -518,7 +518,7 @@ module WkpayrollHelper
 			wktxnDetail.gl_transaction_id = glTransaction.id
 			wktxnDetail.detail_type = ledgersIdHash[key.to_i] == 'd' ? 'c' : 'd'
 			wktxnDetail.amount = value
-			wktxnDetail.currency = Setting.plugin_redmine_wktime['wktime_currency']
+			wktxnDetail.currency = Setting.plugin_redmine_wktime_lite['wktime_currency']
 			totalDebit = totalDebit + value.to_i if ['b', 'a', 'r'].include?(ledgersIdHash[key.to_i])
 			totalCredit = totalCredit + value.to_i if ledgersIdHash[key.to_i] == 'd'
 			unless wktxnDetail.valid?
@@ -528,11 +528,11 @@ module WkpayrollHelper
 			end
 		}
 		wktxnDetail = WkGlTransactionDetail.new
-		wktxnDetail.ledger_id = Setting.plugin_redmine_wktime['wktime_cr_ledger'].to_i
+		wktxnDetail.ledger_id = Setting.plugin_redmine_wktime_lite['wktime_cr_ledger'].to_i
 		wktxnDetail.gl_transaction_id = glTransaction.id
 		wktxnDetail.detail_type = 'c'
 		wktxnDetail.amount = totalDebit - totalCredit
-		wktxnDetail.currency = Setting.plugin_redmine_wktime['wktime_currency']
+		wktxnDetail.currency = Setting.plugin_redmine_wktime_lite['wktime_currency']
 		unless wktxnDetail.valid?
 			errorMsg = wktxnDetail.errors.full_messages.join("<br>")
 		else
@@ -560,7 +560,7 @@ module WkpayrollHelper
 	end
 
 	def getQueryStr
-		#joinDateCFId = !Setting.plugin_redmine_wktime['wktime_attn_join_date_cf'].blank? ? Setting.plugin_redmine_wktime['wktime_attn_join_date_cf'].to_i : 0
+		#joinDateCFId = !Setting.plugin_redmine_wktime_lite['wktime_attn_join_date_cf'].blank? ? Setting.plugin_redmine_wktime_lite['wktime_attn_join_date_cf'].to_i : 0
 		queryStr = "select u.id as user_id, u.firstname as firstname, u.lastname as lastname, sc.name as component_name, sc.id as sc_component_id, wu.join_date," +
 		" wu.id1, wu.gender,"+
 		"  s.salary_date as salary_date, s.amount as amount, s.currency as currency," +
@@ -846,7 +846,7 @@ module WkpayrollHelper
 
 	def getReimburseProjects
 		projects = Project.active.all
-		projectIds =  Setting.plugin_redmine_wktime['reimburse_projects'] || []
+		projectIds =  Setting.plugin_redmine_wktime_lite['reimburse_projects'] || []
 		projectIds.reject! {|id| id.to_s == "" } if projectIds.present?
 		projectIds =  projects.pluck(:id) if projects.present? && projectIds.length == 0
 		projectIds

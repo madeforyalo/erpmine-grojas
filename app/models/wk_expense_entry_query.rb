@@ -189,8 +189,8 @@ class WkExpenseEntryQuery < Query
 			condStatement = condStatement.blank? ? condStatement : "(" + condStatement + ") OR (" + mgrCondStatement + ")"
 		end
 	else
-		#if (!Setting.plugin_redmine_wktime['ftte_view_only_own_spent_time'].blank? &&
-		#Setting.plugin_redmine_wktime['ftte_view_only_own_spent_time'].to_i == 1) &&
+		#if (!Setting.plugin_redmine_wktime_lite['ftte_view_only_own_spent_time'].blank? &&
+		#Setting.plugin_redmine_wktime_lite['ftte_view_only_own_spent_time'].to_i == 1) &&
 		if !valid_ERP_perm && !User.current.admin? && !isManager
 			condStatement = condStatement.blank? ? condStatement : condStatement + " AND (#{WkExpenseEntry.table_name}.user_id = " + User.current.id.to_s + ")"
 		elsif isManager && !valid_ERP_perm && !User.current.admin?

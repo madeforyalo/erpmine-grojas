@@ -29,7 +29,6 @@
 		<table>
 			<tr>
 				<td>
-					<% attachment = WkLocation.getMainLogo() %>
 					<% if attachment.present? %>
 						<%= image_tag(download_location_attachment_path(attachment, attachment.filename), class: 'filecontent image') %>
 					<% end %>
@@ -49,17 +48,17 @@
 		<th align="left" width="10%"><%= l(:field_project) %></th>
 		<th align="left" width="15%"><%= l(:field_issue) %></th>
 		<th align="left" width="5%"><%= l(:field_activity) %></th>
-		<% if !Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].to_i == 1 %>
+		<% if !Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].to_i == 1 %>
 			<th align="left"><%= l(:field_comments)%></th>
 			<% columnCount = columnCount + 1 %>
 		<% end %>
 		<% @new_custom_field_values = controller.getNewCustomField #TimeEntry.new.custom_field_values %>
 		<%  if !@new_custom_field_values.blank? %>
 			<%	cf_value = nil
-			if !Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].blank? &&
+			if !Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row1'].blank? &&
 					(cf_value = @new_custom_field_values.detect { |cfv| 
-						cfv.custom_field.id == Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].to_i }) != nil %>
+						cfv.custom_field.id == Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row1'].to_i }) != nil %>
 				<th align="left">
 					<%= cf_value.custom_field.name %>
 				</th>
@@ -67,9 +66,9 @@
 			<%	end %>
 
 			<%	cf_value = nil
-			if !Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].blank? &&
+			if !Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row2'].blank? &&
 					(cf_value = @new_custom_field_values.detect { |cfv| 
-						cfv.custom_field.id == Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].to_i }) != nil %>
+						cfv.custom_field.id == Setting.plugin_redmine_wktime_lite['wktime_enter_cf_in_row2'].to_i }) != nil %>
 				<th align="left">
 					<%= cf_value.custom_field.name %>
 				</th>
@@ -143,7 +142,7 @@
 		</tr>
 	</tbody>		
 	</table>		
-	<% submissionAck = Setting.plugin_redmine_wktime['wktime_submission_ack'] %>
+	<% submissionAck = Setting.plugin_redmine_wktime_lite['wktime_submission_ack'] %>
 	<p style="font-family:Verdana, sans-serif; font-size:12px;"><%= submissionAck %></p>
 	<div style="float:right;">
 		

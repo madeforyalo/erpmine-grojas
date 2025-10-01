@@ -43,9 +43,9 @@ include Redmine::I18n
 		set_language_if_valid(user.language)
 
 		subject = "#{l(:label_wk_nonsub_mail_subject)}" + " " + startDate.to_s
-		body = !Setting.plugin_redmine_wktime['wktime_nonsub_mail_message'].blank? ?
-		Setting.plugin_redmine_wktime['wktime_nonsub_mail_message'] : "#{l(:nonsub_mail_message_content)}"
-		body += "\n #{l(:label_wk_submission_deadline)}" + " : " + "#{day_name(Setting.plugin_redmine_wktime['wktime_submission_deadline'].to_i)}"
+		body = !Setting.plugin_redmine_wktime_lite['wktime_nonsub_mail_message'].blank? ?
+		Setting.plugin_redmine_wktime_lite['wktime_nonsub_mail_message'] : "#{l(:nonsub_mail_message_content)}"
+		body += "\n #{l(:label_wk_submission_deadline)}" + " : " + "#{day_name(Setting.plugin_redmine_wktime_lite['wktime_submission_deadline'].to_i)}"
 		body += "\n #{l(:field_name)} : #{user.firstname} #{user.lastname} "
 		body += "\n #{ l(:label_week) }" + " : " + startDate.to_s + " - " + (startDate+6).to_s
 

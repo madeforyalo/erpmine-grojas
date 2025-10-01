@@ -13,8 +13,8 @@
 	<th align="left" width="150px" ><%= controller.getLblSpentFor %></th>
 <% end %>
 
-<% if !Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].blank? &&
-	Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].to_i == 1 %>
+<% if !Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].blank? &&
+	Setting.plugin_redmine_wktime_lite['wktime_enter_comment_in_row'].to_i == 1 %>
 	<th align="left"><%= l(:field_comments)%></th>
 <% end %>
 

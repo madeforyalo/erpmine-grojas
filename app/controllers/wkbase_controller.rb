@@ -27,7 +27,6 @@ class WkbaseController < ApplicationController
   helper :custom_fields
   helper :users
 	include SortHelper
-	include WkattendanceHelper
 	include WktimeHelper
 
 	def index
@@ -147,7 +146,6 @@ class WkbaseController < ApplicationController
 	end
 
 	def getUserPermissions
-		wkpermissons = WkPermission.getPermissions
 		settings = {}
 		languageFiles = []
 		Dir["plugins/redmine_wktime/config/locales/*"].each do |path|
@@ -167,9 +165,9 @@ class WkbaseController < ApplicationController
 		end
 
 		permissons = (wkpermissons || []).map{ |perm| perm.short_name }
-		Setting.plugin_redmine_wktime.each{ |key, val| settings[key] = val if val != "" }
+		Setting.plugin_redmine_wktime_lite.each{ |key, val| settings[key] = val if val != "" }
 		configs = {
-			permissions: permissons, mapAPIkey: Setting.plugin_redmine_wktime['label_mapbox_apikey'],
+			permissions: permissons, mapAPIkey: Setting.plugin_redmine_wktime_lite['label_mapbox_apikey'],
 			logEditPermission: getEditLogPermission,
 			settings: settings, languageSet: languageSet
 		}
@@ -222,7 +220,6 @@ class WkbaseController < ApplicationController
 					errorMsg = timeEntry.errors.full_messages.join("<br>")
 				end
 			else
-				materialEntry = WkMaterialEntry.find(wkSpentFor.spent_id)
 				quantity = getAssetQuantity(materialEntry.spent_for.spent_on_time, entryTime, materialEntry.inventory_item_id)
 				materialEntry.quantity = quantity
 				materialEntry.spent_for.end_on = entryTime
@@ -237,7 +234,6 @@ class WkbaseController < ApplicationController
 				else
 					materialEntry.save
 				end
-				inventoryObj = WkInventoryItem.find(materialEntry.inventory_item_id)
 				assetObj = inventoryObj.asset_property
 				assetObj.matterial_entry_id = nil
 				assetObj.save

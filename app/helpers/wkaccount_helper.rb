@@ -18,6 +18,5 @@
 module WkaccountHelper
 
 include WktimeHelper
-include WkinvoiceHelper
-include WkcrmenumerationHelper
+#include WkinvoiceHelper
 end

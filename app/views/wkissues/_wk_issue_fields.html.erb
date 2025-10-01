@@ -35,13 +35,13 @@
 	end
 %>
 
-<% if(Setting.plugin_redmine_wktime['label_no_additional_details_for_issue'].blank? && Setting.plugin_redmine_wktime['label_no_additional_details_for_issue'].to_i == 0) %>
+<% if(Setting.plugin_redmine_wktime_lite['label_no_additional_details_for_issue'].blank? && Setting.plugin_redmine_wktime_lite['label_no_additional_details_for_issue'].to_i == 0) %>
 	<fieldset class="box tabular">
 	<legend><%= l(:label_additional_details) %></legend>
 	<% if wktime_helper.showBilling %>
 		<table style="padding-left:130px;">
 			<%= labelled_fields_for :erpmineissues, @issue.erpmineissues do |issue_fields| %>
-			<% currency =  issue_fields.object&.id.present? ? issue_fields.object&.currency : Setting.plugin_redmine_wktime['wktime_currency'] %>
+			<% currency =  issue_fields.object&.id.present? ? issue_fields.object&.currency : Setting.plugin_redmine_wktime_lite['wktime_currency'] %>
 				<tr>
 				<td style="padding-left:40px;">  <%= issue_fields.select :currency, wkexpense_helper.options_for_currency, {selected: currency} %></td>
 				<td style="padding-left:40px;"><%= issue_fields.text_field :rate %> </td>

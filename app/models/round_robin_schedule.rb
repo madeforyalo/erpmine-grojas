@@ -320,7 +320,7 @@ class RoundRobinSchedule < WkShiftSchedule
 	end
 
 	def scheduleByPreference
-		(!Setting.plugin_redmine_wktime['wk_user_schedule_preference'].blank? && Setting.plugin_redmine_wktime['wk_user_schedule_preference'].to_i == 1)
+		(!Setting.plugin_redmine_wktime_lite['wk_user_schedule_preference'].blank? && Setting.plugin_redmine_wktime_lite['wk_user_schedule_preference'].to_i == 1)
 	end
 
 	# Return active users role wise
@@ -504,7 +504,7 @@ class RoundRobinSchedule < WkShiftSchedule
 		# nextDate = from
 		# interval = 1
 		# scheduleOnWeekEnds = false
-		# if Setting.plugin_redmine_wktime['wk_schedule_on_weekend'].to_i == 1
+		# if Setting.plugin_redmine_wktime_lite['wk_schedule_on_weekend'].to_i == 1
 			# scheduleOnWeekEnds = true
 		# end
 		weekEndArr = getWeekEndArr(from)
@@ -589,7 +589,7 @@ class RoundRobinSchedule < WkShiftSchedule
 	# Return weekend dates as array for the given week start
 	def getWeekEndArr(weekStartDt)
 		weekEndArr = Array.new
-		weekArr = Setting.plugin_redmine_wktime['wk_schedule_weekend'].to_a
+		weekArr = Setting.plugin_redmine_wktime_lite['wk_schedule_weekend'].to_a
 		unless weekArr.blank?
 			weekArr.each do | day |
 				weekEndArr << getDayOnWeek(weekStartDt, day.to_i)
@@ -608,7 +608,7 @@ class RoundRobinSchedule < WkShiftSchedule
 
 	def isScheduleOnWeekEnd
 		scheduleOnWeekEnds = false
-		if Setting.plugin_redmine_wktime['wk_schedule_on_weekend'].to_i == 1
+		if Setting.plugin_redmine_wktime_lite['wk_schedule_on_weekend'].to_i == 1
 			scheduleOnWeekEnds = true
 		end
 		scheduleOnWeekEnds
@@ -617,8 +617,8 @@ class RoundRobinSchedule < WkShiftSchedule
 	# Return day off count per period
 	def getDayOffCount
 		dayCount = 0
-		unless Setting.plugin_redmine_wktime['wk_schedule_weekend'].blank?
-			dayCount = Setting.plugin_redmine_wktime['wk_schedule_weekend'].length
+		unless Setting.plugin_redmine_wktime_lite['wk_schedule_weekend'].blank?
+			dayCount = Setting.plugin_redmine_wktime_lite['wk_schedule_weekend'].length
 		end
 		dayCount
 	end

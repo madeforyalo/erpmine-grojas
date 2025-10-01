@@ -1,7 +1,7 @@
 module WkdashboardHelper
 	# Return the graphs with its type
 	# key - graph name, value - graph type
-	include WkreportHelper
+#	include WkreportHelper
 	include WktimeHelper
 
   def get_graphs_yaml_path
@@ -30,7 +30,7 @@ module WkdashboardHelper
   end
 
   def showDashboard
-		!Setting.plugin_redmine_wktime['wktime_enable_dashboards_module'].blank? &&
-			Setting.plugin_redmine_wktime['wktime_enable_dashboards_module'].to_i == 1
+		!Setting.plugin_redmine_wktime_lite['wktime_enable_dashboards_module'].blank? &&
+			Setting.plugin_redmine_wktime_lite['wktime_enable_dashboards_module'].to_i == 1
   end
 end
